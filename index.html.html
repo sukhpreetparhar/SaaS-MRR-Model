@@ -3,1094 +3,1105 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SaaS MRR Financial Model</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<title>SaaS MRR Model — by Sukhpreet Singh</title>
+<meta name="description" content="Free interactive SaaS financial model. Track MRR, burn rate, runway and unit economics. Built by Sukhpreet Singh, Aspiring ACCA.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0a0b0f;
-    --surface: #111318;
-    --surface2: #181b23;
-    --border: #1f2330;
-    --border2: #2a2f42;
-    --accent: #4fffb0;
-    --accent2: #ff6b6b;
-    --accent3: #ffd166;
-    --accent4: #74b9ff;
-    --text: #e8eaf2;
-    --text2: #8b90a8;
-    --text3: #555b77;
-    --green: #4fffb0;
-    --red: #ff6b6b;
-    --yellow: #ffd166;
-    --blue: #74b9ff;
-    --purple: #c77dff;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    font-family: 'JetBrains Mono', monospace;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* GRID BACKGROUND */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(79,255,176,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(79,255,176,0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .app { position: relative; z-index: 1; }
-
-  /* HEADER */
-  header {
-    padding: 32px 40px 24px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: linear-gradient(180deg, rgba(79,255,176,0.04) 0%, transparent 100%);
-  }
-
-  .logo-area {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-
-  .logo-badge {
-    width: 40px; height: 40px;
-    background: var(--accent);
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 16px;
-    color: var(--bg);
-    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-  }
-
-  .logo-text {
-    font-family: 'Syne', sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--text2);
-  }
-
-  .logo-text span { color: var(--accent); }
-
-  .header-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 22px;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-  }
-
-  .header-meta {
-    font-size: 11px;
-    color: var(--text3);
-    letter-spacing: 0.1em;
-    text-align: right;
-  }
-
-  .header-meta .live-dot {
-    display: inline-block;
-    width: 6px; height: 6px;
-    background: var(--accent);
-    border-radius: 50%;
-    margin-right: 6px;
-    animation: pulse 2s infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-  }
-
-  /* MAIN LAYOUT */
-  main { padding: 32px 40px; display: flex; flex-direction: column; gap: 28px; }
-
-  /* SECTION LABEL */
-  .section-label {
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--text3);
-    margin-bottom: 14px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .section-label::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
-
-  /* INPUT GRID */
-  .inputs-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 2px;
-    background: var(--border);
-    border: 1px solid var(--border);
-    overflow: hidden;
-  }
-
-  .input-cell {
-    background: var(--surface);
-    padding: 18px 20px;
-    transition: background 0.15s;
-  }
-  .input-cell:hover { background: var(--surface2); }
-
-  .input-cell label {
-    display: block;
-    font-size: 10px;
-    color: var(--text3);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    margin-bottom: 10px;
-  }
-
-  .input-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .input-prefix {
-    font-size: 13px;
-    color: var(--accent);
-    font-weight: 500;
-  }
-
-  .input-cell input[type="number"] {
-    background: transparent;
-    border: none;
-    outline: none;
-    color: var(--text);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 20px;
-    font-weight: 500;
-    width: 100%;
-    -moz-appearance: textfield;
-  }
-  .input-cell input::-webkit-outer-spin-button,
-  .input-cell input::-webkit-inner-spin-button { -webkit-appearance: none; }
-
-  .input-hint {
-    font-size: 10px;
-    color: var(--text3);
-    margin-top: 6px;
-  }
-
-  /* SCENARIO TABS */
-  .scenario-tabs {
-    display: flex;
-    gap: 2px;
-    background: var(--border);
-    padding: 2px;
-    width: fit-content;
-  }
-
-  .tab-btn {
-    padding: 8px 20px;
-    background: transparent;
-    border: none;
-    color: var(--text3);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-
-  .tab-btn.active {
-    background: var(--surface2);
-    color: var(--accent);
-  }
-
-  .tab-btn:hover:not(.active) { color: var(--text2); }
-
-  /* KPI CARDS */
-  .kpi-row {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 2px;
-    background: var(--border);
-  }
-
-  .kpi-card {
-    background: var(--surface);
-    padding: 22px 24px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .kpi-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-  }
-  .kpi-card.green::before { background: var(--green); }
-  .kpi-card.red::before { background: var(--red); }
-  .kpi-card.yellow::before { background: var(--yellow); }
-  .kpi-card.blue::before { background: var(--blue); }
-  .kpi-card.purple::before { background: var(--purple); }
-
-  .kpi-label {
-    font-size: 10px;
-    color: var(--text3);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    margin-bottom: 12px;
-  }
-
-  .kpi-value {
-    font-family: 'Syne', sans-serif;
-    font-size: 26px;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    margin-bottom: 6px;
-  }
-
-  .kpi-card.green .kpi-value { color: var(--green); }
-  .kpi-card.red .kpi-value { color: var(--red); }
-  .kpi-card.yellow .kpi-value { color: var(--yellow); }
-  .kpi-card.blue .kpi-value { color: var(--blue); }
-  .kpi-card.purple .kpi-value { color: var(--purple); }
-
-  .kpi-sub {
-    font-size: 10px;
-    color: var(--text3);
-  }
-
-  /* TABLE */
-  .table-wrap {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    overflow-x: auto;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 12px;
-  }
-
-  thead tr {
-    background: var(--surface2);
-    border-bottom: 1px solid var(--border2);
-  }
-
-  thead th {
-    padding: 12px 16px;
-    text-align: right;
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text3);
-    white-space: nowrap;
-  }
-
-  thead th:first-child { text-align: left; }
-
-  tbody tr {
-    border-bottom: 1px solid var(--border);
-    transition: background 0.1s;
-  }
-
-  tbody tr:hover { background: rgba(255,255,255,0.02); }
-
-  tbody tr.section-header td {
-    background: var(--surface2);
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text3);
-    padding: 8px 16px;
-    border-bottom: 1px solid var(--border2);
-  }
-
-  tbody tr.total-row td {
-    border-top: 1px solid var(--border2);
-    font-weight: 500;
-  }
-
-  tbody tr.grand-total td {
-    background: rgba(79,255,176,0.04);
-    border-top: 1px solid rgba(79,255,176,0.2);
-    color: var(--accent);
-    font-weight: 500;
-  }
-
-  td {
-    padding: 10px 16px;
-    text-align: right;
-    color: var(--text2);
-    white-space: nowrap;
-  }
-
-  td:first-child {
-    text-align: left;
-    color: var(--text);
-    padding-left: 20px;
-  }
-
-  td.positive { color: var(--green); }
-  td.negative { color: var(--red); }
-  td.neutral { color: var(--yellow); }
-  td.highlight { color: var(--accent); font-weight: 500; }
-
-  /* CHART AREA */
-  .charts-grid {
-    display: grid;
-    grid-template-columns: 1.4fr 1fr;
-    gap: 2px;
-    background: var(--border);
-  }
-
-  .chart-panel {
-    background: var(--surface);
-    padding: 24px;
-  }
-
-  .chart-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 13px;
-    font-weight: 700;
-    margin-bottom: 20px;
-    color: var(--text);
-  }
-
-  .chart-title span {
-    font-size: 10px;
-    font-weight: 400;
-    color: var(--text3);
-    margin-left: 8px;
-    font-family: 'JetBrains Mono', monospace;
-    letter-spacing: 0.05em;
-  }
-
-  canvas { display: block; }
-
-  /* RUNWAY BAR */
-  .runway-section {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    padding: 28px;
-  }
-
-  .runway-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    margin-bottom: 24px;
-  }
-
-  .runway-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 16px;
-    font-weight: 700;
-  }
-
-  .runway-months {
-    font-family: 'Syne', sans-serif;
-    font-size: 42px;
-    font-weight: 800;
-    line-height: 1;
-  }
-
-  .runway-label { font-size: 11px; color: var(--text3); margin-top: 4px; }
-
-  .scenario-bars { display: flex; flex-direction: column; gap: 14px; }
-
-  .scenario-bar-row {
-    display: grid;
-    grid-template-columns: 100px 1fr 80px;
-    align-items: center;
-    gap: 16px;
-  }
-
-  .scenario-name {
-    font-size: 11px;
-    color: var(--text3);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
-  .bar-track {
-    height: 8px;
-    background: var(--border2);
-    overflow: hidden;
-  }
-
-  .bar-fill {
-    height: 100%;
-    transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-
-  .bar-months {
-    font-size: 12px;
-    font-weight: 500;
-    text-align: right;
-  }
-
-  /* HEALTH SCORE */
-  .health-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 2px;
-    background: var(--border);
-  }
-
-  .health-item {
-    background: var(--surface);
-    padding: 20px 22px;
-  }
-
-  .health-metric { font-size: 11px; color: var(--text3); margin-bottom: 8px; letter-spacing: 0.08em; }
-  .health-value { font-size: 18px; font-weight: 500; margin-bottom: 6px; }
-  .health-bar-track { height: 3px; background: var(--border2); }
-  .health-bar-fill { height: 100%; transition: width 0.8s ease; }
-  .health-status { font-size: 10px; margin-top: 6px; letter-spacing: 0.08em; text-transform: uppercase; }
-
-  /* FOOTER */
-  footer {
-    padding: 20px 40px;
-    border-top: 1px solid var(--border);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .footer-note { font-size: 10px; color: var(--text3); letter-spacing: 0.08em; }
-  .footer-brand { font-size: 10px; color: var(--text3); letter-spacing: 0.15em; text-transform: uppercase; }
-  .footer-brand span { color: var(--accent); }
-
-  /* RESPONSIVE */
-  @media (max-width: 1100px) {
-    .inputs-grid { grid-template-columns: repeat(2, 1fr); }
-    .kpi-row { grid-template-columns: repeat(3, 1fr); }
-    .charts-grid { grid-template-columns: 1fr; }
-    .health-grid { grid-template-columns: repeat(2, 1fr); }
-    main { padding: 20px; }
-    header { padding: 20px; }
-  }
+:root {
+  --ink: #0d0e12;
+  --ink2: #1a1c24;
+  --ink3: #242736;
+  --rule: #2c2f3f;
+  --rule2: #363a50;
+  --fog: #6b7090;
+  --mist: #9499b5;
+  --paper: #e8eaf5;
+  --white: #f4f5fa;
+  --gold: #c9a84c;
+  --gold2: #e8c66a;
+  --teal: #3ecfb2;
+  --rose: #e05c6a;
+  --sky: #5b9cf6;
+  --lavender: #9b8afb;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--ink);
+  color: var(--white);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── NOISE TEXTURE ── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.5;
+}
+
+/* ── HERO ── */
+.hero {
+  position: relative;
+  padding: 64px 48px 56px;
+  border-bottom: 1px solid var(--rule);
+  overflow: hidden;
+}
+
+.hero-glow {
+  position: absolute;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(201,168,76,0.12) 0%, transparent 70%);
+  top: -200px; right: -100px;
+  pointer-events: none;
+}
+
+.hero-glow2 {
+  position: absolute;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(62,207,178,0.07) 0%, transparent 70%);
+  bottom: -150px; left: 100px;
+  pointer-events: none;
+}
+
+.hero-inner {
+  position: relative;
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 40px;
+}
+
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(201,168,76,0.1);
+  border: 1px solid rgba(201,168,76,0.25);
+  padding: 5px 14px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold2);
+  margin-bottom: 20px;
+}
+
+.hero-eyebrow-dot {
+  width: 5px; height: 5px;
+  background: var(--gold2);
+  border-radius: 50%;
+  animation: blink 2s infinite;
+}
+
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+.hero-title {
+  font-family: 'Instrument Serif', serif;
+  font-size: clamp(36px, 4vw, 58px);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--white);
+  margin-bottom: 16px;
+}
+
+.hero-title em {
+  font-style: italic;
+  color: var(--gold2);
+}
+
+.hero-sub {
+  font-size: 15px;
+  font-weight: 300;
+  color: var(--mist);
+  max-width: 560px;
+  line-height: 1.6;
+  margin-bottom: 28px;
+}
+
+.hero-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.hero-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--fog);
+  background: var(--ink2);
+  border: 1px solid var(--rule);
+  padding: 4px 12px;
+  letter-spacing: 0.05em;
+}
+
+/* ── AUTHOR CARD ── */
+.author-card {
+  background: var(--ink2);
+  border: 1px solid var(--rule);
+  padding: 24px 28px;
+  min-width: 260px;
+  position: relative;
+}
+
+.author-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--gold), var(--teal));
+}
+
+.author-avatar {
+  width: 48px; height: 48px;
+  background: linear-gradient(135deg, var(--gold), var(--teal));
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Instrument Serif', serif;
+  font-size: 20px;
+  color: var(--ink);
+  margin-bottom: 14px;
+  font-weight: 400;
+}
+
+.author-name {
+  font-family: 'Instrument Serif', serif;
+  font-size: 20px;
+  color: var(--white);
+  margin-bottom: 4px;
+}
+
+.author-title {
+  font-size: 12px;
+  color: var(--fog);
+  letter-spacing: 0.05em;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.author-links {
+  display: flex;
+  gap: 8px;
+}
+
+.author-link {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold2);
+  text-decoration: none;
+  border: 1px solid rgba(201,168,76,0.3);
+  padding: 5px 10px;
+  transition: all 0.2s;
+}
+
+.author-link:hover {
+  background: rgba(201,168,76,0.1);
+  color: var(--gold2);
+}
+
+.author-link.secondary {
+  color: var(--fog);
+  border-color: var(--rule);
+}
+
+.author-link.secondary:hover {
+  color: var(--mist);
+  background: var(--ink3);
+}
+
+/* ── MAIN ── */
+.main {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px 48px 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+/* ── SECTION HEADER ── */
+.sec-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.sec-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--gold);
+  letter-spacing: 0.1em;
+  background: rgba(201,168,76,0.08);
+  border: 1px solid rgba(201,168,76,0.2);
+  padding: 3px 8px;
+}
+
+.sec-title {
+  font-family: 'Instrument Serif', serif;
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--white);
+  letter-spacing: -0.01em;
+}
+
+.sec-line {
+  flex: 1;
+  height: 1px;
+  background: var(--rule);
+}
+
+/* ── INPUTS ── */
+.inputs-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+}
+
+.inp-cell {
+  background: var(--ink2);
+  padding: 20px 22px;
+  transition: background 0.15s;
+  position: relative;
+}
+
+.inp-cell:hover { background: var(--ink3); }
+
+.inp-cell:focus-within {
+  background: var(--ink3);
+  outline: 1px solid rgba(201,168,76,0.3);
+  outline-offset: -1px;
+}
+
+.inp-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--fog);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.inp-row {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.inp-sym {
+  font-family: 'DM Mono', monospace;
+  font-size: 14px;
+  color: var(--gold);
+  font-weight: 300;
+}
+
+.inp-cell input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--white);
+  font-family: 'Outfit', sans-serif;
+  font-size: 22px;
+  font-weight: 500;
+  width: 100%;
+  -moz-appearance: textfield;
+}
+
+.inp-cell input::-webkit-outer-spin-button,
+.inp-cell input::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+.inp-hint {
+  font-size: 11px;
+  color: var(--rule2);
+  margin-top: 6px;
+  font-weight: 300;
+}
+
+/* ── SCENARIO TOGGLE ── */
+.scenario-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.scenario-toggle {
+  display: flex;
+  background: var(--ink2);
+  border: 1px solid var(--rule);
+  overflow: hidden;
+}
+
+.scen-btn {
+  padding: 9px 24px;
+  background: transparent;
+  border: none;
+  color: var(--fog);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.15s;
+  border-right: 1px solid var(--rule);
+}
+
+.scen-btn:last-child { border-right: none; }
+
+.scen-btn.active {
+  background: var(--ink3);
+  color: var(--gold2);
+}
+
+.scen-btn:hover:not(.active) { color: var(--mist); }
+
+.scenario-desc {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--fog);
+  letter-spacing: 0.05em;
+}
+
+/* ── KPI STRIP ── */
+.kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+}
+
+.kpi {
+  background: var(--ink2);
+  padding: 22px 22px 18px;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.15s;
+}
+
+.kpi:hover { background: var(--ink3); }
+
+.kpi-accent {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+}
+
+.kpi-lbl {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--fog);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.kpi-val {
+  font-family: 'Instrument Serif', serif;
+  font-size: 30px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  margin-bottom: 5px;
+  line-height: 1;
+}
+
+.kpi-sub {
+  font-size: 11px;
+  color: var(--fog);
+  font-weight: 300;
+}
+
+/* ── CHARTS ── */
+.charts-row {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+}
+
+.chart-box {
+  background: var(--ink2);
+  padding: 28px;
+}
+
+.chart-hd {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.chart-name {
+  font-family: 'Instrument Serif', serif;
+  font-size: 17px;
+  font-weight: 400;
+  color: var(--white);
+}
+
+.chart-desc {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--fog);
+  letter-spacing: 0.05em;
+  margin-top: 4px;
+}
+
+/* ── TABLE ── */
+.tbl-wrap {
+  background: var(--ink2);
+  border: 1px solid var(--rule);
+  overflow-x: auto;
+}
+
+table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+
+thead tr {
+  background: var(--ink3);
+  border-bottom: 1px solid var(--rule2);
+}
+
+thead th {
+  padding: 13px 16px;
+  text-align: right;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fog);
+  white-space: nowrap;
+}
+
+thead th:first-child { text-align: left; }
+
+tbody tr {
+  border-bottom: 1px solid rgba(44,47,63,0.6);
+  transition: background 0.1s;
+}
+
+tbody tr:hover { background: rgba(255,255,255,0.02); }
+
+td {
+  padding: 11px 16px;
+  text-align: right;
+  color: var(--mist);
+  font-weight: 300;
+  white-space: nowrap;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+}
+
+td:first-child {
+  text-align: left;
+  color: var(--white);
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  padding-left: 20px;
+}
+
+td.pos { color: var(--teal); }
+td.neg { color: var(--rose); }
+td.hi { color: var(--gold2); font-weight: 500; }
+td.warn { color: var(--rose); }
+
+/* ── RUNWAY ── */
+.runway-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+}
+
+.runway-box {
+  background: var(--ink2);
+  padding: 32px;
+}
+
+.runway-big {
+  font-family: 'Instrument Serif', serif;
+  font-size: 72px;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--gold2);
+  letter-spacing: -0.03em;
+}
+
+.runway-unit {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--fog);
+  letter-spacing: 0.1em;
+  margin-top: 6px;
+  margin-bottom: 32px;
+}
+
+.scen-bars { display: flex; flex-direction: column; gap: 16px; }
+
+.scen-bar-row {
+  display: grid;
+  grid-template-columns: 90px 1fr 60px;
+  align-items: center;
+  gap: 14px;
+}
+
+.scen-nm {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--fog);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.bar-track {
+  height: 6px;
+  background: var(--ink3);
+  border: 1px solid var(--rule);
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  transition: width 0.8s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+.bar-val {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  text-align: right;
+  font-weight: 500;
+}
+
+/* ── HEALTH ── */
+.health-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--rule);
+}
+
+.health-item {
+  background: var(--ink2);
+  padding: 22px 24px;
+  transition: background 0.15s;
+}
+
+.health-item:hover { background: var(--ink3); }
+
+.h-metric {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--fog);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.h-val {
+  font-family: 'Instrument Serif', serif;
+  font-size: 26px;
+  font-weight: 400;
+  margin-bottom: 8px;
+  line-height: 1;
+}
+
+.h-bar-track {
+  height: 2px;
+  background: var(--ink3);
+  margin-bottom: 6px;
+}
+
+.h-bar-fill { height: 100%; transition: width 0.8s ease; }
+
+.h-status {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ── FOOTER ── */
+footer {
+  border-top: 1px solid var(--rule);
+  padding: 28px 48px;
+  max-width: 100%;
+}
+
+.footer-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.footer-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.footer-name {
+  font-family: 'Instrument Serif', serif;
+  font-size: 16px;
+  color: var(--white);
+}
+
+.footer-pipe {
+  width: 1px; height: 16px;
+  background: var(--rule2);
+}
+
+.footer-tagline {
+  font-size: 12px;
+  color: var(--fog);
+  font-weight: 300;
+}
+
+.footer-right {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--rule2);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* ── ANIMATE IN ── */
+@keyframes fadeUp {
+  from { opacity:0; transform: translateY(16px); }
+  to { opacity:1; transform: translateY(0); }
+}
+
+.hero-inner, .inputs-grid, .kpi-strip, .charts-row, .tbl-wrap, .runway-grid {
+  animation: fadeUp 0.5s ease both;
+}
+
+.kpi-strip { animation-delay: 0.1s; }
+.charts-row { animation-delay: 0.15s; }
+.tbl-wrap { animation-delay: 0.2s; }
+.runway-grid { animation-delay: 0.25s; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 1100px) {
+  .inputs-grid { grid-template-columns: repeat(2,1fr); }
+  .kpi-strip { grid-template-columns: repeat(3,1fr); }
+  .charts-row { grid-template-columns: 1fr; }
+  .runway-grid { grid-template-columns: 1fr; }
+  .health-grid { grid-template-columns: repeat(2,1fr); }
+  .main { padding: 28px 20px 48px; }
+  .hero { padding: 40px 20px 36px; }
+  footer { padding: 20px; }
+  .hero-inner { grid-template-columns: 1fr; }
+  .author-card { min-width: unset; }
+}
 </style>
 </head>
 <body>
-<div class="app">
 
-<header>
-  <div class="logo-area">
-    <div class="logo-badge">CF</div>
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+  <div class="hero-inner">
     <div>
-      <div class="logo-text"><span>SaaS</span> Financial Model</div>
-      <div style="font-size:11px;color:var(--text3);margin-top:2px;">MRR Waterfall · Burn · Runway · Unit Economics</div>
+      <div class="hero-eyebrow">
+        <span class="hero-eyebrow-dot"></span>
+        Free Tool · SaaS Finance
+      </div>
+      <h1 class="hero-title">SaaS MRR <em>Financial Model</em></h1>
+      <p class="hero-sub">An interactive financial model for seed-stage SaaS founders. Model your MRR growth, burn rate, cash runway, and unit economics — live, in your browser. No signup required.</p>
+      <div class="hero-tags">
+        <span class="hero-tag">MRR Waterfall</span>
+        <span class="hero-tag">Burn Rate</span>
+        <span class="hero-tag">Cash Runway</span>
+        <span class="hero-tag">LTV:CAC</span>
+        <span class="hero-tag">3 Scenarios</span>
+        <span class="hero-tag">12-Month Projection</span>
+      </div>
     </div>
-  </div>
-  <div class="header-title">Revenue Intelligence Dashboard</div>
-  <div class="header-meta">
-    <div><span class="live-dot"></span>Live Model</div>
-    <div style="margin-top:4px;" id="current-date"></div>
+    <div class="author-card">
+      <div class="author-avatar">SS</div>
+      <div class="author-name">Sukhpreet Singh</div>
+      <div class="author-title">Aspiring ACCA</div>
+      <div class="author-links">
+        <a href="https://www.linkedin.com/in/sukhpreet-parhar-b7b6392a0/" target="_blank" class="author-link">LinkedIn</a>
+        <a href="mailto:hello@sukhpreetsingh.com" class="author-link secondary">Work Together</a>
+      </div>
+    </div>
   </div>
 </header>
 
-<main>
+<div class="main">
 
   <!-- INPUTS -->
-  <div>
-    <div class="section-label">Model Assumptions</div>
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">01</span>
+      <span class="sec-title">Model Assumptions</span>
+      <span class="sec-line"></span>
+    </div>
     <div class="inputs-grid">
-      <div class="input-cell">
-        <label>Starting MRR ($)</label>
-        <div class="input-wrapper">
-          <span class="input-prefix">$</span>
-          <input type="number" id="startMRR" value="18000" min="0" step="1000">
-        </div>
-        <div class="input-hint">Current monthly recurring revenue</div>
+      <div class="inp-cell">
+        <label class="inp-label">Starting MRR</label>
+        <div class="inp-row"><span class="inp-sym">$</span><input type="number" id="startMRR" value="18000" min="0" step="1000"></div>
+        <div class="inp-hint">Current monthly recurring revenue</div>
       </div>
-      <div class="input-cell">
-        <label>New MRR / Month ($)</label>
-        <div class="input-wrapper">
-          <span class="input-prefix">$</span>
-          <input type="number" id="newMRR" value="3500" min="0" step="500">
-        </div>
-        <div class="input-hint">New business added monthly</div>
+      <div class="inp-cell">
+        <label class="inp-label">New MRR / Month</label>
+        <div class="inp-row"><span class="inp-sym">$</span><input type="number" id="newMRR" value="3500" min="0" step="500"></div>
+        <div class="inp-hint">New business added each month</div>
       </div>
-      <div class="input-cell">
-        <label>Gross Churn Rate (%)</label>
-        <div class="input-wrapper">
-          <input type="number" id="churnRate" value="4.5" min="0" max="100" step="0.1">
-          <span class="input-prefix">%</span>
-        </div>
-        <div class="input-hint">% of MRR lost monthly</div>
+      <div class="inp-cell">
+        <label class="inp-label">Gross Churn Rate</label>
+        <div class="inp-row"><input type="number" id="churnRate" value="4.5" min="0" max="100" step="0.1"><span class="inp-sym">%</span></div>
+        <div class="inp-hint">% of MRR lost monthly to cancellations</div>
       </div>
-      <div class="input-cell">
-        <label>Expansion MRR (%)</label>
-        <div class="input-wrapper">
-          <input type="number" id="expansionRate" value="2.0" min="0" max="100" step="0.1">
-          <span class="input-prefix">%</span>
-        </div>
-        <div class="input-hint">Upsell/expansion rate</div>
+      <div class="inp-cell">
+        <label class="inp-label">Expansion MRR</label>
+        <div class="inp-row"><input type="number" id="expansionRate" value="2.0" min="0" max="100" step="0.1"><span class="inp-sym">%</span></div>
+        <div class="inp-hint">Upsell / upgrade rate monthly</div>
       </div>
-      <div class="input-cell">
-        <label>Monthly Burn ($)</label>
-        <div class="input-wrapper">
-          <span class="input-prefix">$</span>
-          <input type="number" id="monthlyBurn" value="32000" min="0" step="1000">
-        </div>
-        <div class="input-hint">Total operating expenses/month</div>
+      <div class="inp-cell">
+        <label class="inp-label">Monthly Burn</label>
+        <div class="inp-row"><span class="inp-sym">$</span><input type="number" id="monthlyBurn" value="32000" min="0" step="1000"></div>
+        <div class="inp-hint">Total operating expenses per month</div>
       </div>
-      <div class="input-cell">
-        <label>Cash in Bank ($)</label>
-        <div class="input-wrapper">
-          <span class="input-prefix">$</span>
-          <input type="number" id="cashBalance" value="380000" min="0" step="10000">
-        </div>
-        <div class="input-hint">Current bank balance</div>
+      <div class="inp-cell">
+        <label class="inp-label">Cash in Bank</label>
+        <div class="inp-row"><span class="inp-sym">$</span><input type="number" id="cashBalance" value="380000" min="0" step="10000"></div>
+        <div class="inp-hint">Current available cash balance</div>
       </div>
-      <div class="input-cell">
-        <label>Gross Margin (%)</label>
-        <div class="input-wrapper">
-          <input type="number" id="grossMargin" value="72" min="0" max="100" step="1">
-          <span class="input-prefix">%</span>
-        </div>
-        <div class="input-hint">Revenue - COGS ÷ Revenue</div>
+      <div class="inp-cell">
+        <label class="inp-label">Gross Margin</label>
+        <div class="inp-row"><input type="number" id="grossMargin" value="72" min="0" max="100" step="1"><span class="inp-sym">%</span></div>
+        <div class="inp-hint">Revenue minus COGS ÷ revenue</div>
       </div>
-      <div class="input-cell">
-        <label>CAC ($)</label>
-        <div class="input-wrapper">
-          <span class="input-prefix">$</span>
-          <input type="number" id="cac" value="1800" min="0" step="100">
-        </div>
-        <div class="input-hint">Cost to acquire one customer</div>
+      <div class="inp-cell">
+        <label class="inp-label">CAC</label>
+        <div class="inp-row"><span class="inp-sym">$</span><input type="number" id="cac" value="1800" min="0" step="100"></div>
+        <div class="inp-hint">Cost to acquire one customer</div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- SCENARIO + KPIs -->
-  <div>
-    <div class="section-label">Key Metrics
-      <div class="scenario-tabs" style="margin-left:16px;margin-bottom:0;">
-        <button class="tab-btn active" onclick="setScenario('base',this)">Base</button>
-        <button class="tab-btn" onclick="setScenario('bull',this)">Bull +30%</button>
-        <button class="tab-btn" onclick="setScenario('bear',this)">Bear −30%</button>
+  <!-- KPIs -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">02</span>
+      <span class="sec-title">Key Metrics</span>
+      <span class="sec-line"></span>
+      <div class="scenario-toggle">
+        <button class="scen-btn active" onclick="setScen('base',this)">Base</button>
+        <button class="scen-btn" onclick="setScen('bull',this)">Bull +30%</button>
+        <button class="scen-btn" onclick="setScen('bear',this)">Bear −30%</button>
       </div>
     </div>
-
-    <div class="kpi-row" id="kpi-row">
-      <!-- filled by JS -->
-    </div>
-  </div>
+    <div class="kpi-strip" id="kpi-strip"></div>
+  </section>
 
   <!-- CHARTS -->
-  <div>
-    <div class="section-label">Visual Analytics</div>
-    <div class="charts-grid">
-      <div class="chart-panel">
-        <div class="chart-title">MRR Waterfall <span>12-month projection</span></div>
-        <canvas id="mrrChart" height="200"></canvas>
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">03</span>
+      <span class="sec-title">Visual Analytics</span>
+      <span class="sec-line"></span>
+    </div>
+    <div class="charts-row">
+      <div class="chart-box">
+        <div class="chart-hd">
+          <div>
+            <div class="chart-name">MRR Waterfall</div>
+            <div class="chart-desc">New · Expansion · Churn · Ending MRR — 12 month projection</div>
+          </div>
+        </div>
+        <canvas id="mrrChart" height="180"></canvas>
       </div>
-      <div class="chart-panel">
-        <div class="chart-title">Cash Runway <span>burn vs. revenue</span></div>
-        <canvas id="runwayChart" height="200"></canvas>
+      <div class="chart-box">
+        <div class="chart-hd">
+          <div>
+            <div class="chart-name">Cash Runway</div>
+            <div class="chart-desc">Projected cash balance over 12 months</div>
+          </div>
+        </div>
+        <canvas id="runwayChart" height="180"></canvas>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- MRR TABLE -->
-  <div>
-    <div class="section-label">MRR Waterfall Table</div>
-    <div class="table-wrap">
-      <table id="mrrTable">
+  <!-- TABLE -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">04</span>
+      <span class="sec-title">MRR Waterfall Table</span>
+      <span class="sec-line"></span>
+    </div>
+    <div class="tbl-wrap">
+      <table>
         <thead>
           <tr>
             <th>Month</th>
-            <th>Beginning MRR</th>
-            <th>+ New MRR</th>
+            <th>Begin MRR</th>
+            <th>+ New</th>
             <th>+ Expansion</th>
             <th>− Churn</th>
-            <th>Ending MRR</th>
-            <th>Net New MRR</th>
-            <th>MoM Growth</th>
-            <th>Cash Remaining</th>
+            <th>End MRR</th>
+            <th>Net New</th>
+            <th>MoM %</th>
             <th>Net Burn</th>
+            <th>Cash Left</th>
           </tr>
         </thead>
-        <tbody id="mrrTableBody"></tbody>
+        <tbody id="tblBody"></tbody>
       </table>
     </div>
-  </div>
+  </section>
 
-  <!-- RUNWAY SCENARIOS -->
-  <div>
-    <div class="section-label">Runway Stress Test</div>
-    <div class="runway-section">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;">
-        <div>
-          <div class="runway-header">
-            <div>
-              <div class="runway-title">Base Scenario Runway</div>
-              <div class="runway-label">at current burn & growth rate</div>
-            </div>
-            <div style="text-align:right;">
-              <div class="runway-months" id="runwayMonths" style="color:var(--accent);">—</div>
-              <div class="runway-label">months</div>
-            </div>
-          </div>
-          <div class="scenario-bars" id="scenario-bars"></div>
-        </div>
-        <div>
-          <div style="margin-bottom:20px;">
-            <div class="section-label" style="margin-bottom:12px;">Unit Economics Health</div>
-            <div class="health-grid" id="health-grid"></div>
-          </div>
-        </div>
+  <!-- RUNWAY -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">05</span>
+      <span class="sec-title">Runway Stress Test</span>
+      <span class="sec-line"></span>
+    </div>
+    <div class="runway-grid">
+      <div class="runway-box">
+        <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--fog);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:12px;">Base Scenario Runway</div>
+        <div class="runway-big" id="runwayNum">—</div>
+        <div class="runway-unit">months of runway remaining</div>
+        <div class="scen-bars" id="scenBars"></div>
+      </div>
+      <div class="runway-box">
+        <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--fog);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:16px;">Unit Economics Health</div>
+        <div class="health-grid" id="healthGrid"></div>
       </div>
     </div>
-  </div>
-
-</main>
-
-<footer>
-  <div class="footer-note">Model updates in real-time as you edit inputs above · All figures in USD</div>
-  <div class="footer-brand"><span>SaaS</span> CFO · Financial Intelligence</div>
-</footer>
+  </section>
 
 </div>
 
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-left">
+      <div class="footer-name">Sukhpreet Singh</div>
+      <div class="footer-pipe"></div>
+      <div class="footer-tagline">Aspiring ACCA · SaaS Finance</div>
+    </div>
+    <div class="footer-right">Free to use · Share freely · Built with ♥ for SaaS founders</div>
+  </div>
+</footer>
+
 <script>
-// ─── STATE ───────────────────────────────────────────────────────────────────
-let scenarioMultiplier = 1.0;
-let mrrChartInstance = null;
-let runwayChartInstance = null;
+let scenMult = 1.0;
+let mrrChart, runwayChart;
 
-// ─── DATE ────────────────────────────────────────────────────────────────────
-document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', {
-  month: 'long', day: 'numeric', year: 'numeric'
-});
+const MO = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function moLabel(i) {
+  const d = new Date(); d.setMonth(d.getMonth()+i);
+  return MO[d.getMonth()]+" '"+String(d.getFullYear()).slice(2);
+}
+const fmt = n => '$'+Math.round(n).toLocaleString();
+const fmtK = n => Math.abs(n)>=1000 ? '$'+(n/1000).toFixed(1)+'k' : '$'+Math.round(n).toLocaleString();
+const fmtP = n => (n>=0?'+':'')+n.toFixed(1)+'%';
 
-// ─── SCENARIO ────────────────────────────────────────────────────────────────
-function setScenario(s, btn) {
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+function setScen(s, btn) {
+  document.querySelectorAll('.scen-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  if (s === 'bull') scenarioMultiplier = 1.3;
-  else if (s === 'bear') scenarioMultiplier = 0.7;
-  else scenarioMultiplier = 1.0;
+  scenMult = s==='bull'?1.3:s==='bear'?0.7:1.0;
   compute();
 }
 
-// ─── HELPERS ─────────────────────────────────────────────────────────────────
-const fmt = (n) => '$' + Math.round(n).toLocaleString();
-const fmtK = (n) => {
-  if (Math.abs(n) >= 1000) return '$' + (n/1000).toFixed(1) + 'k';
-  return '$' + Math.round(n).toLocaleString();
-};
-const fmtPct = (n) => (n >= 0 ? '+' : '') + n.toFixed(1) + '%';
-const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-
-function getMonthLabel(offset) {
-  const d = new Date();
-  d.setMonth(d.getMonth() + offset);
-  return months[d.getMonth()] + " '" + String(d.getFullYear()).slice(2);
-}
-
-// ─── MAIN COMPUTE ─────────────────────────────────────────────────────────────
 function compute() {
-  const startMRR   = +document.getElementById('startMRR').value || 0;
-  const newMRR     = (+document.getElementById('newMRR').value || 0) * scenarioMultiplier;
-  const churnRate  = (+document.getElementById('churnRate').value || 0) / 100;
-  const expRate    = (+document.getElementById('expansionRate').value || 0) / 100;
-  const burn       = +document.getElementById('monthlyBurn').value || 0;
-  const cash       = +document.getElementById('cashBalance').value || 0;
-  const gm         = (+document.getElementById('grossMargin').value || 0) / 100;
-  const cac        = +document.getElementById('cac').value || 0;
+  const sM  = +document.getElementById('startMRR').value||0;
+  const nM  = (+document.getElementById('newMRR').value||0)*scenMult;
+  const ch  = (+document.getElementById('churnRate').value||0)/100;
+  const ex  = (+document.getElementById('expansionRate').value||0)/100;
+  const bu  = +document.getElementById('monthlyBurn').value||0;
+  const ca  = +document.getElementById('cashBalance').value||0;
+  const gm  = (+document.getElementById('grossMargin').value||0)/100;
+  const cac = +document.getElementById('cac').value||0;
 
-  // 12-month projection
-  const rows = [];
-  let mrr = startMRR;
-  let cashLeft = cash;
+  const rows=[], ARPU=200;
+  let mrr=sM, cash=ca;
 
-  for (let i = 0; i < 12; i++) {
-    const beginMRR   = mrr;
-    const expansion  = mrr * expRate;
-    const churn      = mrr * churnRate;
-    const endMRR     = beginMRR + newMRR + expansion - churn;
-    const netNew     = endMRR - beginMRR;
-    const momGrowth  = beginMRR > 0 ? ((endMRR - beginMRR) / beginMRR) * 100 : 0;
-    const netBurn    = burn - (endMRR * gm);
-    cashLeft         = cashLeft - netBurn;
-    rows.push({ month: i, beginMRR, newMRR, expansion, churn, endMRR, netNew, momGrowth, cashLeft, netBurn });
-    mrr = endMRR;
+  for(let i=0;i<12;i++){
+    const beg=mrr, exp=mrr*ex, churn=mrr*ch, end=beg+nM+exp-churn;
+    const netNew=end-beg, mom=beg>0?((end-beg)/beg)*100:0;
+    const netBurn=bu-(end*gm);
+    cash-=netBurn;
+    rows.push({beg,nM,exp,churn,end,netNew,mom,netBurn,cash});
+    mrr=end;
   }
 
-  // Derived KPIs
-  const finalMRR = rows[11].endMRR;
-  const arr = finalMRR * 12;
-  const avgARPU = 200; // assumed
-  const ltv = cac > 0 ? (avgARPU * gm) / churnRate : 0;
-  const ltvCac = cac > 0 ? ltv / cac : 0;
-  const cacPayback = cac > 0 && avgARPU * gm > 0 ? cac / (avgARPU * gm) : 0;
-  const nrr = ((1 + expRate - churnRate) * 100);
+  const ltv  = ch>0?(ARPU*gm)/ch:0;
+  const ltvC = cac>0?ltv/cac:0;
+  const payb = cac>0&&ARPU*gm>0?cac/(ARPU*gm):0;
+  const nrr  = (1+ex-ch)*100;
+  const rBase= bu>0?ca/Math.max(bu-sM*gm,1):99;
+  const rBull= bu>0?ca/Math.max(bu-sM*gm*1.3,1):99;
+  const rBear= bu>0?ca/Math.max(bu-sM*gm*0.7,1):99;
 
-  // Runway scenarios
-  const runwayBase = burn > 0 ? cash / Math.max(burn - startMRR * gm, 1) : 99;
-  const runwayBull = burn > 0 ? cash / Math.max(burn - startMRR * gm * 1.3, 1) : 99;
-  const runwayBear = burn > 0 ? cash / Math.max(burn - startMRR * gm * 0.7, 1) : 99;
-
-  renderKPIs(finalMRR, arr, nrr, ltvCac, runwayBase, cacPayback);
+  renderKPIs(rows[11].end, rows[11].end*12, nrr, ltvC, rBase, payb);
   renderTable(rows);
-  renderMRRChart(rows);
-  renderRunwayChart(rows, cash, burn);
-  renderRunwayBars(runwayBase, runwayBull, runwayBear);
-  renderHealth(ltvCac, nrr, churnRate * 100, cacPayback, gm * 100);
+  renderMRR(rows);
+  renderRunway(rows, ca, bu, gm);
+  renderScenBars(rBase,rBull,rBear);
+  renderHealth(ltvC,nrr,ch*100,payb,gm*100);
 }
 
-// ─── KPIs ─────────────────────────────────────────────────────────────────────
-function renderKPIs(finalMRR, arr, nrr, ltvCac, runway, cacPayback) {
-  document.getElementById('runwayMonths').textContent = Math.max(0, Math.round(runway));
-
-  const kpis = [
-    { label: 'Projected MRR (M12)', value: fmtK(finalMRR), sub: 'End of 12-month period', cls: 'green' },
-    { label: 'ARR Run Rate', value: fmtK(arr), sub: 'Annualized at month 12', cls: 'blue' },
-    { label: 'Net Revenue Retention', value: nrr.toFixed(1) + '%', sub: nrr >= 100 ? '✓ Expansion > Churn' : '✗ Below 100%', cls: nrr >= 100 ? 'green' : 'red' },
-    { label: 'LTV : CAC Ratio', value: ltvCac > 0 ? ltvCac.toFixed(1) + 'x' : 'N/A', sub: ltvCac >= 3 ? '✓ Healthy (>3x)' : '✗ Needs work (<3x)', cls: ltvCac >= 3 ? 'green' : 'yellow' },
-    { label: 'CAC Payback', value: cacPayback > 0 ? cacPayback.toFixed(1) + ' mo' : 'N/A', sub: cacPayback <= 12 ? '✓ Efficient (<12mo)' : '⚠ Review spend', cls: cacPayback <= 12 ? 'green' : 'red' },
+function renderKPIs(mrr12,arr,nrr,ltvC,runway,payb){
+  document.getElementById('runwayNum').textContent=Math.max(0,Math.round(runway));
+  const kpis=[
+    {l:'MRR at Month 12',v:fmtK(mrr12),s:'End of projection',c:'var(--teal)'},
+    {l:'ARR Run Rate',v:fmtK(arr),s:'Annualized revenue',c:'var(--sky)'},
+    {l:'Net Rev Retention',v:nrr.toFixed(1)+'%',s:nrr>=100?'Expansion > Churn':'Below 100%',c:nrr>=100?'var(--teal)':'var(--rose)'},
+    {l:'LTV : CAC',v:ltvC>0?ltvC.toFixed(1)+'x':'N/A',s:ltvC>=3?'Healthy (>3x)':'Needs improvement',c:ltvC>=3?'var(--teal)':'var(--gold2)'},
+    {l:'CAC Payback',v:payb>0?payb.toFixed(1)+' mo':'N/A',s:payb<=12?'Efficient (<12mo)':'Review spend',c:payb<=12?'var(--teal)':'var(--rose)'},
   ];
-
-  document.getElementById('kpi-row').innerHTML = kpis.map(k => `
-    <div class="kpi-card ${k.cls}">
-      <div class="kpi-label">${k.label}</div>
-      <div class="kpi-value">${k.value}</div>
-      <div class="kpi-sub">${k.sub}</div>
-    </div>
-  `).join('');
+  document.getElementById('kpi-strip').innerHTML=kpis.map(k=>`
+    <div class="kpi">
+      <div class="kpi-lbl">${k.l}</div>
+      <div class="kpi-val" style="color:${k.c}">${k.v}</div>
+      <div class="kpi-sub">${k.s}</div>
+      <div class="kpi-accent" style="background:${k.c};opacity:0.5;"></div>
+    </div>`).join('');
 }
 
-// ─── TABLE ─────────────────────────────────────────────────────────────────────
-function renderTable(rows) {
-  const body = document.getElementById('mrrTableBody');
-  body.innerHTML = rows.map((r, i) => {
-    const runwayOk = r.cashLeft > 0;
-    return `<tr>
-      <td>${getMonthLabel(i + 1)}</td>
-      <td>${fmt(r.beginMRR)}</td>
-      <td class="positive">+${fmt(r.newMRR)}</td>
-      <td class="positive">+${fmt(r.expansion)}</td>
-      <td class="negative">−${fmt(r.churn)}</td>
-      <td class="highlight">${fmt(r.endMRR)}</td>
-      <td class="${r.netNew >= 0 ? 'positive' : 'negative'}">${r.netNew >= 0 ? '+' : ''}${fmt(r.netNew)}</td>
-      <td class="${r.momGrowth >= 0 ? 'positive' : 'negative'}">${fmtPct(r.momGrowth)}</td>
-      <td class="${runwayOk ? '' : 'negative'}">${runwayOk ? fmt(r.cashLeft) : '⚠ ' + fmt(r.cashLeft)}</td>
-      <td class="${r.netBurn > 0 ? 'negative' : 'positive'}">${r.netBurn > 0 ? '−' : '+'}${fmt(Math.abs(r.netBurn))}</td>
-    </tr>`;
-  }).join('');
+function renderTable(rows){
+  document.getElementById('tblBody').innerHTML=rows.map((r,i)=>`<tr>
+    <td>${moLabel(i+1)}</td>
+    <td>${fmt(r.beg)}</td>
+    <td class="pos">+${fmt(r.nM)}</td>
+    <td class="pos">+${fmt(r.exp)}</td>
+    <td class="neg">−${fmt(r.churn)}</td>
+    <td class="hi">${fmt(r.end)}</td>
+    <td class="${r.netNew>=0?'pos':'neg'}">${r.netNew>=0?'+':''}${fmt(r.netNew)}</td>
+    <td class="${r.mom>=0?'pos':'neg'}">${fmtP(r.mom)}</td>
+    <td class="${r.netBurn>0?'neg':'pos'}">${r.netBurn>0?'−':'+'}${fmt(Math.abs(r.netBurn))}</td>
+    <td class="${r.cash>0?'':'warn'}">${fmt(Math.max(r.cash,0))}</td>
+  </tr>`).join('');
 }
 
-// ─── MRR CHART ────────────────────────────────────────────────────────────────
-function renderMRRChart(rows) {
-  const ctx = document.getElementById('mrrChart').getContext('2d');
-  if (mrrChartInstance) mrrChartInstance.destroy();
-
-  const labels = rows.map((_, i) => getMonthLabel(i + 1));
-
-  mrrChartInstance = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [
-        {
-          label: 'New MRR',
-          data: rows.map(r => r.newMRR),
-          backgroundColor: 'rgba(79,255,176,0.7)',
-          stack: 'stack'
-        },
-        {
-          label: 'Expansion',
-          data: rows.map(r => r.expansion),
-          backgroundColor: 'rgba(116,185,255,0.7)',
-          stack: 'stack'
-        },
-        {
-          label: 'Churn',
-          data: rows.map(r => -r.churn),
-          backgroundColor: 'rgba(255,107,107,0.7)',
-          stack: 'stack'
-        },
-        {
-          label: 'Ending MRR',
-          data: rows.map(r => r.endMRR),
-          type: 'line',
-          borderColor: '#fff',
-          backgroundColor: 'transparent',
-          borderWidth: 1.5,
-          pointBackgroundColor: '#fff',
-          pointRadius: 3,
-          tension: 0.3,
-          yAxisID: 'y2'
-        }
-      ]
+function renderMRR(rows){
+  const ctx=document.getElementById('mrrChart').getContext('2d');
+  if(mrrChart) mrrChart.destroy();
+  const labels=rows.map((_,i)=>moLabel(i+1));
+  const cfg={
+    responsive:true, maintainAspectRatio:true,
+    plugins:{
+      legend:{labels:{color:'#6b7090',font:{family:'DM Mono',size:10},boxWidth:10,padding:16}},
+      tooltip:{backgroundColor:'#1a1c24',borderColor:'#2c2f3f',borderWidth:1,
+        titleColor:'#f4f5fa',bodyColor:'#9499b5',
+        titleFont:{family:'DM Mono'},bodyFont:{family:'DM Mono',size:11},
+        callbacks:{label:c=>` ${c.dataset.label}: $${Math.abs(Math.round(c.raw)).toLocaleString()}`}}
     },
-    options: {
-      responsive: true,
-      maintainAspectRatio: true,
-      interaction: { mode: 'index' },
-      plugins: {
-        legend: {
-          labels: {
-            color: '#8b90a8',
-            font: { family: 'JetBrains Mono', size: 10 },
-            boxWidth: 10
-          }
-        },
-        tooltip: {
-          backgroundColor: '#181b23',
-          borderColor: '#2a2f42',
-          borderWidth: 1,
-          titleColor: '#e8eaf2',
-          bodyColor: '#8b90a8',
-          titleFont: { family: 'JetBrains Mono' },
-          bodyFont: { family: 'JetBrains Mono', size: 11 },
-          callbacks: {
-            label: ctx => ` ${ctx.dataset.label}: $${Math.abs(Math.round(ctx.raw)).toLocaleString()}`
-          }
-        }
+    scales:{
+      x:{stacked:true,ticks:{color:'#6b7090',font:{family:'DM Mono',size:10}},grid:{color:'rgba(255,255,255,0.03)'},border:{color:'#2c2f3f'}},
+      y:{stacked:true,ticks:{color:'#6b7090',font:{family:'DM Mono',size:10},callback:v=>'$'+(v/1000).toFixed(0)+'k'},grid:{color:'rgba(255,255,255,0.04)'},border:{color:'#2c2f3f'}},
+      y2:{position:'right',ticks:{color:'#555',font:{family:'DM Mono',size:10},callback:v=>'$'+(v/1000).toFixed(0)+'k'},grid:{display:false},border:{color:'#2c2f3f'}}
+    }
+  };
+  mrrChart=new Chart(ctx,{
+    type:'bar',
+    data:{labels,datasets:[
+      {label:'New MRR',data:rows.map(r=>r.nM),backgroundColor:'rgba(62,207,178,0.65)',stack:'s'},
+      {label:'Expansion',data:rows.map(r=>r.exp),backgroundColor:'rgba(91,156,246,0.65)',stack:'s'},
+      {label:'Churn',data:rows.map(r=>-r.churn),backgroundColor:'rgba(224,92,106,0.65)',stack:'s'},
+      {label:'Ending MRR',data:rows.map(r=>r.end),type:'line',borderColor:'rgba(201,168,76,0.8)',backgroundColor:'transparent',borderWidth:1.5,pointBackgroundColor:'var(--gold)',pointRadius:3,tension:0.3,yAxisID:'y2'}
+    ]},
+    options:cfg
+  });
+}
+
+function renderRunway(rows,ca,bu,gm){
+  const ctx=document.getElementById('runwayChart').getContext('2d');
+  if(runwayChart) runwayChart.destroy();
+  const labels=['Now',...rows.map((_,i)=>moLabel(i+1))];
+  let c=ca; const cd=[ca];
+  rows.forEach(r=>{c-=(bu-r.end*gm); cd.push(Math.max(c,0));});
+  runwayChart=new Chart(ctx,{
+    type:'line',
+    data:{labels,datasets:[
+      {label:'Cash Remaining',data:cd,borderColor:'var(--teal)',backgroundColor:'rgba(62,207,178,0.07)',fill:true,borderWidth:2,pointRadius:2,tension:0.4},
+      {label:'Zero Line',data:labels.map(()=>0),borderColor:'rgba(224,92,106,0.3)',borderDash:[4,4],borderWidth:1,pointRadius:0}
+    ]},
+    options:{
+      responsive:true,maintainAspectRatio:true,
+      plugins:{
+        legend:{labels:{color:'#6b7090',font:{family:'DM Mono',size:10},boxWidth:10}},
+        tooltip:{backgroundColor:'#1a1c24',borderColor:'#2c2f3f',borderWidth:1,
+          titleColor:'#f4f5fa',bodyColor:'#9499b5',
+          titleFont:{family:'DM Mono'},bodyFont:{family:'DM Mono',size:11},
+          callbacks:{label:c=>` ${c.dataset.label}: $${Math.round(c.raw).toLocaleString()}`}}
       },
-      scales: {
-        x: {
-          stacked: true,
-          ticks: { color: '#555b77', font: { family: 'JetBrains Mono', size: 10 } },
-          grid: { color: 'rgba(255,255,255,0.03)' },
-          border: { color: '#1f2330' }
-        },
-        y: {
-          stacked: true,
-          ticks: {
-            color: '#555b77',
-            font: { family: 'JetBrains Mono', size: 10 },
-            callback: v => '$' + (v/1000).toFixed(0) + 'k'
-          },
-          grid: { color: 'rgba(255,255,255,0.04)' },
-          border: { color: '#1f2330' }
-        },
-        y2: {
-          position: 'right',
-          ticks: {
-            color: '#888',
-            font: { family: 'JetBrains Mono', size: 10 },
-            callback: v => '$' + (v/1000).toFixed(0) + 'k'
-          },
-          grid: { display: false },
-          border: { color: '#1f2330' }
-        }
+      scales:{
+        x:{ticks:{color:'#6b7090',font:{family:'DM Mono',size:10}},grid:{color:'rgba(255,255,255,0.03)'},border:{color:'#2c2f3f'}},
+        y:{ticks:{color:'#6b7090',font:{family:'DM Mono',size:10},callback:v=>'$'+(v/1000).toFixed(0)+'k'},grid:{color:'rgba(255,255,255,0.04)'},border:{color:'#2c2f3f'}}
       }
     }
   });
 }
 
-// ─── RUNWAY CHART ─────────────────────────────────────────────────────────────
-function renderRunwayChart(rows, cash, burn) {
-  const ctx = document.getElementById('runwayChart').getContext('2d');
-  if (runwayChartInstance) runwayChartInstance.destroy();
-
-  const labels = ['Now', ...rows.map((_, i) => getMonthLabel(i + 1))];
-  const gm = (+document.getElementById('grossMargin').value || 0) / 100;
-  const mrr0 = +document.getElementById('startMRR').value || 0;
-
-  let c = cash;
-  const cashData = [cash];
-  rows.forEach(r => {
-    c -= (burn - r.endMRR * gm);
-    cashData.push(Math.max(c, 0));
-  });
-
-  runwayChartInstance = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [
-        {
-          label: 'Cash Remaining',
-          data: cashData,
-          borderColor: '#4fffb0',
-          backgroundColor: 'rgba(79,255,176,0.08)',
-          fill: true,
-          borderWidth: 2,
-          pointRadius: 2,
-          tension: 0.4
-        },
-        {
-          label: 'Danger Zone',
-          data: labels.map(() => 0),
-          borderColor: 'rgba(255,107,107,0.3)',
-          borderDash: [4, 4],
-          borderWidth: 1,
-          pointRadius: 0
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: true,
-      plugins: {
-        legend: {
-          labels: {
-            color: '#8b90a8',
-            font: { family: 'JetBrains Mono', size: 10 },
-            boxWidth: 10
-          }
-        },
-        tooltip: {
-          backgroundColor: '#181b23',
-          borderColor: '#2a2f42',
-          borderWidth: 1,
-          titleColor: '#e8eaf2',
-          bodyColor: '#8b90a8',
-          titleFont: { family: 'JetBrains Mono' },
-          bodyFont: { family: 'JetBrains Mono', size: 11 },
-          callbacks: {
-            label: ctx => ` ${ctx.dataset.label}: $${Math.round(ctx.raw).toLocaleString()}`
-          }
-        }
-      },
-      scales: {
-        x: {
-          ticks: { color: '#555b77', font: { family: 'JetBrains Mono', size: 10 } },
-          grid: { color: 'rgba(255,255,255,0.03)' },
-          border: { color: '#1f2330' }
-        },
-        y: {
-          ticks: {
-            color: '#555b77',
-            font: { family: 'JetBrains Mono', size: 10 },
-            callback: v => '$' + (v/1000).toFixed(0) + 'k'
-          },
-          grid: { color: 'rgba(255,255,255,0.04)' },
-          border: { color: '#1f2330' }
-        }
-      }
-    }
-  });
+function renderScenBars(base,bull,bear){
+  const mx=Math.max(base,bull,bear,1);
+  const sc=[
+    {n:'Bear −30%',m:bear,c:'var(--rose)'},
+    {n:'Base',m:base,c:'var(--teal)'},
+    {n:'Bull +30%',m:bull,c:'var(--sky)'},
+  ];
+  document.getElementById('scenBars').innerHTML=sc.map(s=>`
+    <div class="scen-bar-row">
+      <div class="scen-nm">${s.n}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.min(100,Math.max(0,s.m)/mx*100)}%;background:${s.c};"></div></div>
+      <div class="bar-val" style="color:${s.c};">${Math.max(0,Math.round(s.m))} mo</div>
+    </div>`).join('');
 }
 
-// ─── RUNWAY BARS ──────────────────────────────────────────────────────────────
-function renderRunwayBars(base, bull, bear) {
-  document.getElementById('runwayMonths').textContent = Math.max(0, Math.round(base));
-
-  const maxR = Math.max(base, bull, bear, 1);
-  const scenarios = [
-    { name: 'Bear −30%', months: bear, color: '#ff6b6b' },
-    { name: 'Base', months: base, color: '#4fffb0' },
-    { name: 'Bull +30%', months: bull, color: '#74b9ff' },
+function renderHealth(ltvC,nrr,chPct,payb,gmPct){
+  const items=[
+    {m:'LTV : CAC',v:ltvC>0?ltvC.toFixed(1)+'x':'N/A',b:Math.min(100,(ltvC/5)*100),c:ltvC>=3?'var(--teal)':ltvC>=1.5?'var(--gold2)':'var(--rose)',s:ltvC>=3?'Healthy':'Needs work'},
+    {m:'Net Rev Retention',v:nrr.toFixed(1)+'%',b:Math.min(100,(nrr/130)*100),c:nrr>=100?'var(--teal)':nrr>=85?'var(--gold2)':'var(--rose)',s:nrr>=100?'Expansion Mode':'At Risk'},
+    {m:'Gross Churn',v:chPct.toFixed(1)+'%',b:Math.min(100,(chPct/15)*100),c:chPct<=3?'var(--teal)':chPct<=6?'var(--gold2)':'var(--rose)',s:chPct<=3?'Excellent':chPct<=6?'Acceptable':'High Risk'},
+    {m:'CAC Payback',v:payb>0?payb.toFixed(1)+' mo':'N/A',b:Math.min(100,100-(payb/36)*100),c:payb<=12?'var(--teal)':payb<=24?'var(--gold2)':'var(--rose)',s:payb<=12?'Efficient':'Review'},
+    {m:'Gross Margin',v:gmPct.toFixed(0)+'%',b:Math.min(100,(gmPct/90)*100),c:gmPct>=70?'var(--teal)':gmPct>=50?'var(--gold2)':'var(--rose)',s:gmPct>=70?'SaaS Benchmark':'Below Avg'},
+    {m:'MRR Quality',v:nrr>=100?'Strong':'Leaking',b:Math.min(100,(nrr/120)*100),c:nrr>=110?'var(--sky)':nrr>=100?'var(--teal)':'var(--rose)',s:nrr>=110?'Best-in-Class':nrr>=100?'Healthy':'Needs Attention'},
   ];
-
-  document.getElementById('scenario-bars').innerHTML = scenarios.map(s => `
-    <div class="scenario-bar-row">
-      <div class="scenario-name">${s.name}</div>
-      <div class="bar-track">
-        <div class="bar-fill" style="width:${Math.min(100, (Math.max(0,s.months)/maxR)*100)}%;background:${s.color};"></div>
-      </div>
-      <div class="bar-months" style="color:${s.color};">${Math.max(0,Math.round(s.months))} mo</div>
-    </div>
-  `).join('');
-}
-
-// ─── HEALTH SCORE ─────────────────────────────────────────────────────────────
-function renderHealth(ltvCac, nrr, churnPct, cacPayback, gmPct) {
-  const items = [
-    {
-      metric: 'LTV:CAC Ratio',
-      value: ltvCac > 0 ? ltvCac.toFixed(1) + 'x' : 'N/A',
-      bar: Math.min(100, (ltvCac / 5) * 100),
-      color: ltvCac >= 3 ? '#4fffb0' : ltvCac >= 1.5 ? '#ffd166' : '#ff6b6b',
-      status: ltvCac >= 3 ? 'Healthy' : ltvCac >= 1.5 ? 'Monitor' : 'Critical',
-      statusColor: ltvCac >= 3 ? '#4fffb0' : ltvCac >= 1.5 ? '#ffd166' : '#ff6b6b'
-    },
-    {
-      metric: 'Net Revenue Retention',
-      value: nrr.toFixed(1) + '%',
-      bar: Math.min(100, (nrr / 130) * 100),
-      color: nrr >= 100 ? '#4fffb0' : nrr >= 85 ? '#ffd166' : '#ff6b6b',
-      status: nrr >= 100 ? 'Expansion Mode' : nrr >= 85 ? 'Monitor' : 'At Risk',
-      statusColor: nrr >= 100 ? '#4fffb0' : nrr >= 85 ? '#ffd166' : '#ff6b6b'
-    },
-    {
-      metric: 'Gross Churn Rate',
-      value: churnPct.toFixed(1) + '%',
-      bar: Math.min(100, (churnPct / 15) * 100),
-      color: churnPct <= 3 ? '#4fffb0' : churnPct <= 6 ? '#ffd166' : '#ff6b6b',
-      status: churnPct <= 3 ? 'Excellent' : churnPct <= 6 ? 'Acceptable' : 'High Risk',
-      statusColor: churnPct <= 3 ? '#4fffb0' : churnPct <= 6 ? '#ffd166' : '#ff6b6b'
-    },
-    {
-      metric: 'CAC Payback Period',
-      value: cacPayback > 0 ? cacPayback.toFixed(1) + ' mo' : 'N/A',
-      bar: Math.min(100, 100 - (cacPayback / 36) * 100),
-      color: cacPayback <= 12 ? '#4fffb0' : cacPayback <= 24 ? '#ffd166' : '#ff6b6b',
-      status: cacPayback <= 12 ? 'Efficient' : cacPayback <= 24 ? 'Monitor' : 'Inefficient',
-      statusColor: cacPayback <= 12 ? '#4fffb0' : cacPayback <= 24 ? '#ffd166' : '#ff6b6b'
-    },
-    {
-      metric: 'Gross Margin',
-      value: gmPct.toFixed(0) + '%',
-      bar: Math.min(100, (gmPct / 90) * 100),
-      color: gmPct >= 70 ? '#4fffb0' : gmPct >= 50 ? '#ffd166' : '#ff6b6b',
-      status: gmPct >= 70 ? 'SaaS Benchmark' : gmPct >= 50 ? 'Below Avg' : 'Investigate',
-      statusColor: gmPct >= 70 ? '#4fffb0' : gmPct >= 50 ? '#ffd166' : '#ff6b6b'
-    },
-    {
-      metric: 'Net Revenue Retention',
-      value: nrr.toFixed(1) + '%',
-      bar: Math.min(100, (nrr / 120) * 100),
-      color: nrr >= 110 ? '#74b9ff' : nrr >= 100 ? '#4fffb0' : '#ff6b6b',
-      status: nrr >= 110 ? 'Best-in-Class' : nrr >= 100 ? 'Healthy' : 'Leaking',
-      statusColor: nrr >= 110 ? '#74b9ff' : nrr >= 100 ? '#4fffb0' : '#ff6b6b'
-    }
-  ];
-
-  document.getElementById('health-grid').innerHTML = items.map(item => `
+  document.getElementById('healthGrid').innerHTML=items.map(x=>`
     <div class="health-item">
-      <div class="health-metric">${item.metric}</div>
-      <div class="health-value" style="color:${item.color};">${item.value}</div>
-      <div class="health-bar-track">
-        <div class="health-bar-fill" style="width:${item.bar}%;background:${item.color};"></div>
-      </div>
-      <div class="health-status" style="color:${item.statusColor};">${item.status}</div>
-    </div>
-  `).join('');
+      <div class="h-metric">${x.m}</div>
+      <div class="h-val" style="color:${x.c}">${x.v}</div>
+      <div class="h-bar-track"><div class="h-bar-fill" style="width:${x.b}%;background:${x.c};"></div></div>
+      <div class="h-status" style="color:${x.c}">${x.s}</div>
+    </div>`).join('');
 }
 
-// ─── INIT ─────────────────────────────────────────────────────────────────────
-// Load Chart.js
-const script = document.createElement('script');
-script.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
-script.onload = () => compute();
-document.head.appendChild(script);
-
-// Live update on input change
-document.querySelectorAll('input').forEach(inp => {
-  inp.addEventListener('input', () => {
-    if (window.Chart) compute();
-  });
-});
+// Load Chart.js then init
+const s=document.createElement('script');
+s.src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
+s.onload=()=>compute();
+document.head.appendChild(s);
+document.querySelectorAll('input').forEach(i=>i.addEventListener('input',()=>{if(window.Chart)compute();}));
 </script>
 </body>
 </html>

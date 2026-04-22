@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SaaS MRR Financial Model</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0b0f;
+    --surface: #111318;
+    --surface2: #181b23;
+    --border: #1f2330;
+    --border2: #2a2f42;
+    --accent: #4fffb0;
+    --accent2: #ff6b6b;
+    --accent3: #ffd166;
+    --accent4: #74b9ff;
+    --text: #e8eaf2;
+    --text2: #8b90a8;
+    --text3: #555b77;
+    --green: #4fffb0;
+    --red: #ff6b6b;
+    --yellow: #ffd166;
+    --blue: #74b9ff;
+    --purple: #c77dff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* GRID BACKGROUND */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(79,255,176,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(79,255,176,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app { position: relative; z-index: 1; }
+
+  /* HEADER */
+  header {
+    padding: 32px 40px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(180deg, rgba(79,255,176,0.04) 0%, transparent 100%);
+  }
+
+  .logo-area {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .logo-badge {
+    width: 40px; height: 40px;
+    background: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 16px;
+    color: var(--bg);
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  }
+
+  .logo-text {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text2);
+  }
+
+  .logo-text span { color: var(--accent); }
+
+  .header-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  .header-meta {
+    font-size: 11px;
+    color: var(--text3);
+    letter-spacing: 0.1em;
+    text-align: right;
+  }
+
+  .header-meta .live-dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    margin-right: 6px;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* MAIN LAYOUT */
+  main { padding: 32px 40px; display: flex; flex-direction: column; gap: 28px; }
+
+  /* SECTION LABEL */
+  .section-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* INPUT GRID */
+  .inputs-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .input-cell {
+    background: var(--surface);
+    padding: 18px 20px;
+    transition: background 0.15s;
+  }
+  .input-cell:hover { background: var(--surface2); }
+
+  .input-cell label {
+    display: block;
+    font-size: 10px;
+    color: var(--text3);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .input-prefix {
+    font-size: 13px;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .input-cell input[type="number"] {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 20px;
+    font-weight: 500;
+    width: 100%;
+    -moz-appearance: textfield;
+  }
+  .input-cell input::-webkit-outer-spin-button,
+  .input-cell input::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+  .input-hint {
+    font-size: 10px;
+    color: var(--text3);
+    margin-top: 6px;
+  }
+
+  /* SCENARIO TABS */
+  .scenario-tabs {
+    display: flex;
+    gap: 2px;
+    background: var(--border);
+    padding: 2px;
+    width: fit-content;
+  }
+
+  .tab-btn {
+    padding: 8px 20px;
+    background: transparent;
+    border: none;
+    color: var(--text3);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .tab-btn.active {
+    background: var(--surface2);
+    color: var(--accent);
+  }
+
+  .tab-btn:hover:not(.active) { color: var(--text2); }
+
+  /* KPI CARDS */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 2px;
+    background: var(--border);
+  }
+
+  .kpi-card {
+    background: var(--surface);
+    padding: 22px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+  .kpi-card.green::before { background: var(--green); }
+  .kpi-card.red::before { background: var(--red); }
+  .kpi-card.yellow::before { background: var(--yellow); }
+  .kpi-card.blue::before { background: var(--blue); }
+  .kpi-card.purple::before { background: var(--purple); }
+
+  .kpi-label {
+    font-size: 10px;
+    color: var(--text3);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .kpi-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+  }
+
+  .kpi-card.green .kpi-value { color: var(--green); }
+  .kpi-card.red .kpi-value { color: var(--red); }
+  .kpi-card.yellow .kpi-value { color: var(--yellow); }
+  .kpi-card.blue .kpi-value { color: var(--blue); }
+  .kpi-card.purple .kpi-value { color: var(--purple); }
+
+  .kpi-sub {
+    font-size: 10px;
+    color: var(--text3);
+  }
+
+  /* TABLE */
+  .table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+
+  thead tr {
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border2);
+  }
+
+  thead th {
+    padding: 12px 16px;
+    text-align: right;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text3);
+    white-space: nowrap;
+  }
+
+  thead th:first-child { text-align: left; }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+  }
+
+  tbody tr:hover { background: rgba(255,255,255,0.02); }
+
+  tbody tr.section-header td {
+    background: var(--surface2);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text3);
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--border2);
+  }
+
+  tbody tr.total-row td {
+    border-top: 1px solid var(--border2);
+    font-weight: 500;
+  }
+
+  tbody tr.grand-total td {
+    background: rgba(79,255,176,0.04);
+    border-top: 1px solid rgba(79,255,176,0.2);
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  td {
+    padding: 10px 16px;
+    text-align: right;
+    color: var(--text2);
+    white-space: nowrap;
+  }
+
+  td:first-child {
+    text-align: left;
+    color: var(--text);
+    padding-left: 20px;
+  }
+
+  td.positive { color: var(--green); }
+  td.negative { color: var(--red); }
+  td.neutral { color: var(--yellow); }
+  td.highlight { color: var(--accent); font-weight: 500; }
+
+  /* CHART AREA */
+  .charts-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 2px;
+    background: var(--border);
+  }
+
+  .chart-panel {
+    background: var(--surface);
+    padding: 24px;
+  }
+
+  .chart-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: var(--text);
+  }
+
+  .chart-title span {
+    font-size: 10px;
+    font-weight: 400;
+    color: var(--text3);
+    margin-left: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.05em;
+  }
+
+  canvas { display: block; }
+
+  /* RUNWAY BAR */
+  .runway-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 28px;
+  }
+
+  .runway-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 24px;
+  }
+
+  .runway-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .runway-months {
+    font-family: 'Syne', sans-serif;
+    font-size: 42px;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .runway-label { font-size: 11px; color: var(--text3); margin-top: 4px; }
+
+  .scenario-bars { display: flex; flex-direction: column; gap: 14px; }
+
+  .scenario-bar-row {
+    display: grid;
+    grid-template-columns: 100px 1fr 80px;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .scenario-name {
+    font-size: 11px;
+    color: var(--text3);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .bar-track {
+    height: 8px;
+    background: var(--border2);
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .bar-months {
+    font-size: 12px;
+    font-weight: 500;
+    text-align: right;
+  }
+
+  /* HEALTH SCORE */
+  .health-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    background: var(--border);
+  }
+
+  .health-item {
+    background: var(--surface);
+    padding: 20px 22px;
+  }
+
+  .health-metric { font-size: 11px; color: var(--text3); margin-bottom: 8px; letter-spacing: 0.08em; }
+  .health-value { font-size: 18px; font-weight: 500; margin-bottom: 6px; }
+  .health-bar-track { height: 3px; background: var(--border2); }
+  .health-bar-fill { height: 100%; transition: width 0.8s ease; }
+  .health-status { font-size: 10px; margin-top: 6px; letter-spacing: 0.08em; text-transform: uppercase; }
+
+  /* FOOTER */
+  footer {
+    padding: 20px 40px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-note { font-size: 10px; color: var(--text3); letter-spacing: 0.08em; }
+  .footer-brand { font-size: 10px; color: var(--text3); letter-spacing: 0.15em; text-transform: uppercase; }
+  .footer-brand span { color: var(--accent); }
+
+  /* RESPONSIVE */
+  @media (max-width: 1100px) {
+    .inputs-grid { grid-template-columns: repeat(2, 1fr); }
+    .kpi-row { grid-template-columns: repeat(3, 1fr); }
+    .charts-grid { grid-template-columns: 1fr; }
+    .health-grid { grid-template-columns: repeat(2, 1fr); }
+    main { padding: 20px; }
+    header { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+<header>
+  <div class="logo-area">
+    <div class="logo-badge">CF</div>
+    <div>
+      <div class="logo-text"><span>SaaS</span> Financial Model</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:2px;">MRR Waterfall · Burn · Runway · Unit Economics</div>
+    </div>
+  </div>
+  <div class="header-title">Revenue Intelligence Dashboard</div>
+  <div class="header-meta">
+    <div><span class="live-dot"></span>Live Model</div>
+    <div style="margin-top:4px;" id="current-date"></div>
+  </div>
+</header>
+
+<main>
+
+  <!-- INPUTS -->
+  <div>
+    <div class="section-label">Model Assumptions</div>
+    <div class="inputs-grid">
+      <div class="input-cell">
+        <label>Starting MRR ($)</label>
+        <div class="input-wrapper">
+          <span class="input-prefix">$</span>
+          <input type="number" id="startMRR" value="18000" min="0" step="1000">
+        </div>
+        <div class="input-hint">Current monthly recurring revenue</div>
+      </div>
+      <div class="input-cell">
+        <label>New MRR / Month ($)</label>
+        <div class="input-wrapper">
+          <span class="input-prefix">$</span>
+          <input type="number" id="newMRR" value="3500" min="0" step="500">
+        </div>
+        <div class="input-hint">New business added monthly</div>
+      </div>
+      <div class="input-cell">
+        <label>Gross Churn Rate (%)</label>
+        <div class="input-wrapper">
+          <input type="number" id="churnRate" value="4.5" min="0" max="100" step="0.1">
+          <span class="input-prefix">%</span>
+        </div>
+        <div class="input-hint">% of MRR lost monthly</div>
+      </div>
+      <div class="input-cell">
+        <label>Expansion MRR (%)</label>
+        <div class="input-wrapper">
+          <input type="number" id="expansionRate" value="2.0" min="0" max="100" step="0.1">
+          <span class="input-prefix">%</span>
+        </div>
+        <div class="input-hint">Upsell/expansion rate</div>
+      </div>
+      <div class="input-cell">
+        <label>Monthly Burn ($)</label>
+        <div class="input-wrapper">
+          <span class="input-prefix">$</span>
+          <input type="number" id="monthlyBurn" value="32000" min="0" step="1000">
+        </div>
+        <div class="input-hint">Total operating expenses/month</div>
+      </div>
+      <div class="input-cell">
+        <label>Cash in Bank ($)</label>
+        <div class="input-wrapper">
+          <span class="input-prefix">$</span>
+          <input type="number" id="cashBalance" value="380000" min="0" step="10000">
+        </div>
+        <div class="input-hint">Current bank balance</div>
+      </div>
+      <div class="input-cell">
+        <label>Gross Margin (%)</label>
+        <div class="input-wrapper">
+          <input type="number" id="grossMargin" value="72" min="0" max="100" step="1">
+          <span class="input-prefix">%</span>
+        </div>
+        <div class="input-hint">Revenue - COGS ÷ Revenue</div>
+      </div>
+      <div class="input-cell">
+        <label>CAC ($)</label>
+        <div class="input-wrapper">
+          <span class="input-prefix">$</span>
+          <input type="number" id="cac" value="1800" min="0" step="100">
+        </div>
+        <div class="input-hint">Cost to acquire one customer</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCENARIO + KPIs -->
+  <div>
+    <div class="section-label">Key Metrics
+      <div class="scenario-tabs" style="margin-left:16px;margin-bottom:0;">
+        <button class="tab-btn active" onclick="setScenario('base',this)">Base</button>
+        <button class="tab-btn" onclick="setScenario('bull',this)">Bull +30%</button>
+        <button class="tab-btn" onclick="setScenario('bear',this)">Bear −30%</button>
+      </div>
+    </div>
+
+    <div class="kpi-row" id="kpi-row">
+      <!-- filled by JS -->
+    </div>
+  </div>
+
+  <!-- CHARTS -->
+  <div>
+    <div class="section-label">Visual Analytics</div>
+    <div class="charts-grid">
+      <div class="chart-panel">
+        <div class="chart-title">MRR Waterfall <span>12-month projection</span></div>
+        <canvas id="mrrChart" height="200"></canvas>
+      </div>
+      <div class="chart-panel">
+        <div class="chart-title">Cash Runway <span>burn vs. revenue</span></div>
+        <canvas id="runwayChart" height="200"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- MRR TABLE -->
+  <div>
+    <div class="section-label">MRR Waterfall Table</div>
+    <div class="table-wrap">
+      <table id="mrrTable">
+        <thead>
+          <tr>
+            <th>Month</th>
+            <th>Beginning MRR</th>
+            <th>+ New MRR</th>
+            <th>+ Expansion</th>
+            <th>− Churn</th>
+            <th>Ending MRR</th>
+            <th>Net New MRR</th>
+            <th>MoM Growth</th>
+            <th>Cash Remaining</th>
+            <th>Net Burn</th>
+          </tr>
+        </thead>
+        <tbody id="mrrTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- RUNWAY SCENARIOS -->
+  <div>
+    <div class="section-label">Runway Stress Test</div>
+    <div class="runway-section">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;">
+        <div>
+          <div class="runway-header">
+            <div>
+              <div class="runway-title">Base Scenario Runway</div>
+              <div class="runway-label">at current burn & growth rate</div>
+            </div>
+            <div style="text-align:right;">
+              <div class="runway-months" id="runwayMonths" style="color:var(--accent);">—</div>
+              <div class="runway-label">months</div>
+            </div>
+          </div>
+          <div class="scenario-bars" id="scenario-bars"></div>
+        </div>
+        <div>
+          <div style="margin-bottom:20px;">
+            <div class="section-label" style="margin-bottom:12px;">Unit Economics Health</div>
+            <div class="health-grid" id="health-grid"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <div class="footer-note">Model updates in real-time as you edit inputs above · All figures in USD</div>
+  <div class="footer-brand"><span>SaaS</span> CFO · Financial Intelligence</div>
+</footer>
+
+</div>
+
+<script>
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let scenarioMultiplier = 1.0;
+let mrrChartInstance = null;
+let runwayChartInstance = null;
+
+// ─── DATE ────────────────────────────────────────────────────────────────────
+document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', {
+  month: 'long', day: 'numeric', year: 'numeric'
+});
+
+// ─── SCENARIO ────────────────────────────────────────────────────────────────
+function setScenario(s, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (s === 'bull') scenarioMultiplier = 1.3;
+  else if (s === 'bear') scenarioMultiplier = 0.7;
+  else scenarioMultiplier = 1.0;
+  compute();
+}
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+const fmt = (n) => '$' + Math.round(n).toLocaleString();
+const fmtK = (n) => {
+  if (Math.abs(n) >= 1000) return '$' + (n/1000).toFixed(1) + 'k';
+  return '$' + Math.round(n).toLocaleString();
+};
+const fmtPct = (n) => (n >= 0 ? '+' : '') + n.toFixed(1) + '%';
+const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function getMonthLabel(offset) {
+  const d = new Date();
+  d.setMonth(d.getMonth() + offset);
+  return months[d.getMonth()] + " '" + String(d.getFullYear()).slice(2);
+}
+
+// ─── MAIN COMPUTE ─────────────────────────────────────────────────────────────
+function compute() {
+  const startMRR   = +document.getElementById('startMRR').value || 0;
+  const newMRR     = (+document.getElementById('newMRR').value || 0) * scenarioMultiplier;
+  const churnRate  = (+document.getElementById('churnRate').value || 0) / 100;
+  const expRate    = (+document.getElementById('expansionRate').value || 0) / 100;
+  const burn       = +document.getElementById('monthlyBurn').value || 0;
+  const cash       = +document.getElementById('cashBalance').value || 0;
+  const gm         = (+document.getElementById('grossMargin').value || 0) / 100;
+  const cac        = +document.getElementById('cac').value || 0;
+
+  // 12-month projection
+  const rows = [];
+  let mrr = startMRR;
+  let cashLeft = cash;
+
+  for (let i = 0; i < 12; i++) {
+    const beginMRR   = mrr;
+    const expansion  = mrr * expRate;
+    const churn      = mrr * churnRate;
+    const endMRR     = beginMRR + newMRR + expansion - churn;
+    const netNew     = endMRR - beginMRR;
+    const momGrowth  = beginMRR > 0 ? ((endMRR - beginMRR) / beginMRR) * 100 : 0;
+    const netBurn    = burn - (endMRR * gm);
+    cashLeft         = cashLeft - netBurn;
+    rows.push({ month: i, beginMRR, newMRR, expansion, churn, endMRR, netNew, momGrowth, cashLeft, netBurn });
+    mrr = endMRR;
+  }
+
+  // Derived KPIs
+  const finalMRR = rows[11].endMRR;
+  const arr = finalMRR * 12;
+  const avgARPU = 200; // assumed
+  const ltv = cac > 0 ? (avgARPU * gm) / churnRate : 0;
+  const ltvCac = cac > 0 ? ltv / cac : 0;
+  const cacPayback = cac > 0 && avgARPU * gm > 0 ? cac / (avgARPU * gm) : 0;
+  const nrr = ((1 + expRate - churnRate) * 100);
+
+  // Runway scenarios
+  const runwayBase = burn > 0 ? cash / Math.max(burn - startMRR * gm, 1) : 99;
+  const runwayBull = burn > 0 ? cash / Math.max(burn - startMRR * gm * 1.3, 1) : 99;
+  const runwayBear = burn > 0 ? cash / Math.max(burn - startMRR * gm * 0.7, 1) : 99;
+
+  renderKPIs(finalMRR, arr, nrr, ltvCac, runwayBase, cacPayback);
+  renderTable(rows);
+  renderMRRChart(rows);
+  renderRunwayChart(rows, cash, burn);
+  renderRunwayBars(runwayBase, runwayBull, runwayBear);
+  renderHealth(ltvCac, nrr, churnRate * 100, cacPayback, gm * 100);
+}
+
+// ─── KPIs ─────────────────────────────────────────────────────────────────────
+function renderKPIs(finalMRR, arr, nrr, ltvCac, runway, cacPayback) {
+  document.getElementById('runwayMonths').textContent = Math.max(0, Math.round(runway));
+
+  const kpis = [
+    { label: 'Projected MRR (M12)', value: fmtK(finalMRR), sub: 'End of 12-month period', cls: 'green' },
+    { label: 'ARR Run Rate', value: fmtK(arr), sub: 'Annualized at month 12', cls: 'blue' },
+    { label: 'Net Revenue Retention', value: nrr.toFixed(1) + '%', sub: nrr >= 100 ? '✓ Expansion > Churn' : '✗ Below 100%', cls: nrr >= 100 ? 'green' : 'red' },
+    { label: 'LTV : CAC Ratio', value: ltvCac > 0 ? ltvCac.toFixed(1) + 'x' : 'N/A', sub: ltvCac >= 3 ? '✓ Healthy (>3x)' : '✗ Needs work (<3x)', cls: ltvCac >= 3 ? 'green' : 'yellow' },
+    { label: 'CAC Payback', value: cacPayback > 0 ? cacPayback.toFixed(1) + ' mo' : 'N/A', sub: cacPayback <= 12 ? '✓ Efficient (<12mo)' : '⚠ Review spend', cls: cacPayback <= 12 ? 'green' : 'red' },
+  ];
+
+  document.getElementById('kpi-row').innerHTML = kpis.map(k => `
+    <div class="kpi-card ${k.cls}">
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-value">${k.value}</div>
+      <div class="kpi-sub">${k.sub}</div>
+    </div>
+  `).join('');
+}
+
+// ─── TABLE ─────────────────────────────────────────────────────────────────────
+function renderTable(rows) {
+  const body = document.getElementById('mrrTableBody');
+  body.innerHTML = rows.map((r, i) => {
+    const runwayOk = r.cashLeft > 0;
+    return `<tr>
+      <td>${getMonthLabel(i + 1)}</td>
+      <td>${fmt(r.beginMRR)}</td>
+      <td class="positive">+${fmt(r.newMRR)}</td>
+      <td class="positive">+${fmt(r.expansion)}</td>
+      <td class="negative">−${fmt(r.churn)}</td>
+      <td class="highlight">${fmt(r.endMRR)}</td>
+      <td class="${r.netNew >= 0 ? 'positive' : 'negative'}">${r.netNew >= 0 ? '+' : ''}${fmt(r.netNew)}</td>
+      <td class="${r.momGrowth >= 0 ? 'positive' : 'negative'}">${fmtPct(r.momGrowth)}</td>
+      <td class="${runwayOk ? '' : 'negative'}">${runwayOk ? fmt(r.cashLeft) : '⚠ ' + fmt(r.cashLeft)}</td>
+      <td class="${r.netBurn > 0 ? 'negative' : 'positive'}">${r.netBurn > 0 ? '−' : '+'}${fmt(Math.abs(r.netBurn))}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ─── MRR CHART ────────────────────────────────────────────────────────────────
+function renderMRRChart(rows) {
+  const ctx = document.getElementById('mrrChart').getContext('2d');
+  if (mrrChartInstance) mrrChartInstance.destroy();
+
+  const labels = rows.map((_, i) => getMonthLabel(i + 1));
+
+  mrrChartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'New MRR',
+          data: rows.map(r => r.newMRR),
+          backgroundColor: 'rgba(79,255,176,0.7)',
+          stack: 'stack'
+        },
+        {
+          label: 'Expansion',
+          data: rows.map(r => r.expansion),
+          backgroundColor: 'rgba(116,185,255,0.7)',
+          stack: 'stack'
+        },
+        {
+          label: 'Churn',
+          data: rows.map(r => -r.churn),
+          backgroundColor: 'rgba(255,107,107,0.7)',
+          stack: 'stack'
+        },
+        {
+          label: 'Ending MRR',
+          data: rows.map(r => r.endMRR),
+          type: 'line',
+          borderColor: '#fff',
+          backgroundColor: 'transparent',
+          borderWidth: 1.5,
+          pointBackgroundColor: '#fff',
+          pointRadius: 3,
+          tension: 0.3,
+          yAxisID: 'y2'
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      interaction: { mode: 'index' },
+      plugins: {
+        legend: {
+          labels: {
+            color: '#8b90a8',
+            font: { family: 'JetBrains Mono', size: 10 },
+            boxWidth: 10
+          }
+        },
+        tooltip: {
+          backgroundColor: '#181b23',
+          borderColor: '#2a2f42',
+          borderWidth: 1,
+          titleColor: '#e8eaf2',
+          bodyColor: '#8b90a8',
+          titleFont: { family: 'JetBrains Mono' },
+          bodyFont: { family: 'JetBrains Mono', size: 11 },
+          callbacks: {
+            label: ctx => ` ${ctx.dataset.label}: $${Math.abs(Math.round(ctx.raw)).toLocaleString()}`
+          }
+        }
+      },
+      scales: {
+        x: {
+          stacked: true,
+          ticks: { color: '#555b77', font: { family: 'JetBrains Mono', size: 10 } },
+          grid: { color: 'rgba(255,255,255,0.03)' },
+          border: { color: '#1f2330' }
+        },
+        y: {
+          stacked: true,
+          ticks: {
+            color: '#555b77',
+            font: { family: 'JetBrains Mono', size: 10 },
+            callback: v => '$' + (v/1000).toFixed(0) + 'k'
+          },
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          border: { color: '#1f2330' }
+        },
+        y2: {
+          position: 'right',
+          ticks: {
+            color: '#888',
+            font: { family: 'JetBrains Mono', size: 10 },
+            callback: v => '$' + (v/1000).toFixed(0) + 'k'
+          },
+          grid: { display: false },
+          border: { color: '#1f2330' }
+        }
+      }
+    }
+  });
+}
+
+// ─── RUNWAY CHART ─────────────────────────────────────────────────────────────
+function renderRunwayChart(rows, cash, burn) {
+  const ctx = document.getElementById('runwayChart').getContext('2d');
+  if (runwayChartInstance) runwayChartInstance.destroy();
+
+  const labels = ['Now', ...rows.map((_, i) => getMonthLabel(i + 1))];
+  const gm = (+document.getElementById('grossMargin').value || 0) / 100;
+  const mrr0 = +document.getElementById('startMRR').value || 0;
+
+  let c = cash;
+  const cashData = [cash];
+  rows.forEach(r => {
+    c -= (burn - r.endMRR * gm);
+    cashData.push(Math.max(c, 0));
+  });
+
+  runwayChartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Cash Remaining',
+          data: cashData,
+          borderColor: '#4fffb0',
+          backgroundColor: 'rgba(79,255,176,0.08)',
+          fill: true,
+          borderWidth: 2,
+          pointRadius: 2,
+          tension: 0.4
+        },
+        {
+          label: 'Danger Zone',
+          data: labels.map(() => 0),
+          borderColor: 'rgba(255,107,107,0.3)',
+          borderDash: [4, 4],
+          borderWidth: 1,
+          pointRadius: 0
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: {
+          labels: {
+            color: '#8b90a8',
+            font: { family: 'JetBrains Mono', size: 10 },
+            boxWidth: 10
+          }
+        },
+        tooltip: {
+          backgroundColor: '#181b23',
+          borderColor: '#2a2f42',
+          borderWidth: 1,
+          titleColor: '#e8eaf2',
+          bodyColor: '#8b90a8',
+          titleFont: { family: 'JetBrains Mono' },
+          bodyFont: { family: 'JetBrains Mono', size: 11 },
+          callbacks: {
+            label: ctx => ` ${ctx.dataset.label}: $${Math.round(ctx.raw).toLocaleString()}`
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: '#555b77', font: { family: 'JetBrains Mono', size: 10 } },
+          grid: { color: 'rgba(255,255,255,0.03)' },
+          border: { color: '#1f2330' }
+        },
+        y: {
+          ticks: {
+            color: '#555b77',
+            font: { family: 'JetBrains Mono', size: 10 },
+            callback: v => '$' + (v/1000).toFixed(0) + 'k'
+          },
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          border: { color: '#1f2330' }
+        }
+      }
+    }
+  });
+}
+
+// ─── RUNWAY BARS ──────────────────────────────────────────────────────────────
+function renderRunwayBars(base, bull, bear) {
+  document.getElementById('runwayMonths').textContent = Math.max(0, Math.round(base));
+
+  const maxR = Math.max(base, bull, bear, 1);
+  const scenarios = [
+    { name: 'Bear −30%', months: bear, color: '#ff6b6b' },
+    { name: 'Base', months: base, color: '#4fffb0' },
+    { name: 'Bull +30%', months: bull, color: '#74b9ff' },
+  ];
+
+  document.getElementById('scenario-bars').innerHTML = scenarios.map(s => `
+    <div class="scenario-bar-row">
+      <div class="scenario-name">${s.name}</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${Math.min(100, (Math.max(0,s.months)/maxR)*100)}%;background:${s.color};"></div>
+      </div>
+      <div class="bar-months" style="color:${s.color};">${Math.max(0,Math.round(s.months))} mo</div>
+    </div>
+  `).join('');
+}
+
+// ─── HEALTH SCORE ─────────────────────────────────────────────────────────────
+function renderHealth(ltvCac, nrr, churnPct, cacPayback, gmPct) {
+  const items = [
+    {
+      metric: 'LTV:CAC Ratio',
+      value: ltvCac > 0 ? ltvCac.toFixed(1) + 'x' : 'N/A',
+      bar: Math.min(100, (ltvCac / 5) * 100),
+      color: ltvCac >= 3 ? '#4fffb0' : ltvCac >= 1.5 ? '#ffd166' : '#ff6b6b',
+      status: ltvCac >= 3 ? 'Healthy' : ltvCac >= 1.5 ? 'Monitor' : 'Critical',
+      statusColor: ltvCac >= 3 ? '#4fffb0' : ltvCac >= 1.5 ? '#ffd166' : '#ff6b6b'
+    },
+    {
+      metric: 'Net Revenue Retention',
+      value: nrr.toFixed(1) + '%',
+      bar: Math.min(100, (nrr / 130) * 100),
+      color: nrr >= 100 ? '#4fffb0' : nrr >= 85 ? '#ffd166' : '#ff6b6b',
+      status: nrr >= 100 ? 'Expansion Mode' : nrr >= 85 ? 'Monitor' : 'At Risk',
+      statusColor: nrr >= 100 ? '#4fffb0' : nrr >= 85 ? '#ffd166' : '#ff6b6b'
+    },
+    {
+      metric: 'Gross Churn Rate',
+      value: churnPct.toFixed(1) + '%',
+      bar: Math.min(100, (churnPct / 15) * 100),
+      color: churnPct <= 3 ? '#4fffb0' : churnPct <= 6 ? '#ffd166' : '#ff6b6b',
+      status: churnPct <= 3 ? 'Excellent' : churnPct <= 6 ? 'Acceptable' : 'High Risk',
+      statusColor: churnPct <= 3 ? '#4fffb0' : churnPct <= 6 ? '#ffd166' : '#ff6b6b'
+    },
+    {
+      metric: 'CAC Payback Period',
+      value: cacPayback > 0 ? cacPayback.toFixed(1) + ' mo' : 'N/A',
+      bar: Math.min(100, 100 - (cacPayback / 36) * 100),
+      color: cacPayback <= 12 ? '#4fffb0' : cacPayback <= 24 ? '#ffd166' : '#ff6b6b',
+      status: cacPayback <= 12 ? 'Efficient' : cacPayback <= 24 ? 'Monitor' : 'Inefficient',
+      statusColor: cacPayback <= 12 ? '#4fffb0' : cacPayback <= 24 ? '#ffd166' : '#ff6b6b'
+    },
+    {
+      metric: 'Gross Margin',
+      value: gmPct.toFixed(0) + '%',
+      bar: Math.min(100, (gmPct / 90) * 100),
+      color: gmPct >= 70 ? '#4fffb0' : gmPct >= 50 ? '#ffd166' : '#ff6b6b',
+      status: gmPct >= 70 ? 'SaaS Benchmark' : gmPct >= 50 ? 'Below Avg' : 'Investigate',
+      statusColor: gmPct >= 70 ? '#4fffb0' : gmPct >= 50 ? '#ffd166' : '#ff6b6b'
+    },
+    {
+      metric: 'Net Revenue Retention',
+      value: nrr.toFixed(1) + '%',
+      bar: Math.min(100, (nrr / 120) * 100),
+      color: nrr >= 110 ? '#74b9ff' : nrr >= 100 ? '#4fffb0' : '#ff6b6b',
+      status: nrr >= 110 ? 'Best-in-Class' : nrr >= 100 ? 'Healthy' : 'Leaking',
+      statusColor: nrr >= 110 ? '#74b9ff' : nrr >= 100 ? '#4fffb0' : '#ff6b6b'
+    }
+  ];
+
+  document.getElementById('health-grid').innerHTML = items.map(item => `
+    <div class="health-item">
+      <div class="health-metric">${item.metric}</div>
+      <div class="health-value" style="color:${item.color};">${item.value}</div>
+      <div class="health-bar-track">
+        <div class="health-bar-fill" style="width:${item.bar}%;background:${item.color};"></div>
+      </div>
+      <div class="health-status" style="color:${item.statusColor};">${item.status}</div>
+    </div>
+  `).join('');
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+// Load Chart.js
+const script = document.createElement('script');
+script.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
+script.onload = () => compute();
+document.head.appendChild(script);
+
+// Live update on input change
+document.querySelectorAll('input').forEach(inp => {
+  inp.addEventListener('input', () => {
+    if (window.Chart) compute();
+  });
+});
+</script>
+</body>
+</html>
